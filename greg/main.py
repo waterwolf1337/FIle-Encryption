@@ -19,7 +19,9 @@ def main(argv: list[str] | None = None) -> int:
             "       greg open FILE.greg\n"
             "       greg encrypt FILE [-o OUTPUT.greg]\n"
             "       greg inspect FILE.greg\n"
-            "       greg install-linux-integration"
+            "       greg install-linux-integration\n"
+            "       greg install-windows-integration\n"
+            "       greg uninstall-windows-integration"
         )
         return 0
     if arguments and arguments[0] == "encrypt":
@@ -28,6 +30,10 @@ def main(argv: list[str] | None = None) -> int:
         return _inspect_command(arguments[1:])
     if arguments and arguments[0] == "install-linux-integration":
         return _install_linux_integration(arguments[1:])
+    if arguments and arguments[0] == "install-windows-integration":
+        return _install_windows_integration(arguments[1:])
+    if arguments and arguments[0] == "uninstall-windows-integration":
+        return _uninstall_windows_integration(arguments[1:])
     if arguments and arguments[0] == "open":
         arguments.pop(0)
     if len(arguments) > 1:
@@ -93,6 +99,30 @@ def _install_linux_integration(argv: list[str]) -> int:
 
     desktop, mime = install_file_association()
     print(f"Installed {desktop}\nInstalled {mime}")
+    return 0
+
+
+def _install_windows_integration(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(prog="greg install-windows-integration")
+    parser.parse_args(argv)
+    if sys.platform != "win32":
+        parser.error("this command is only supported on Windows")
+    from greg.platforms.windows import install_file_association
+
+    install_file_association()
+    print("Registered .greg for the current Windows user.")
+    return 0
+
+
+def _uninstall_windows_integration(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(prog="greg uninstall-windows-integration")
+    parser.parse_args(argv)
+    if sys.platform != "win32":
+        parser.error("this command is only supported on Windows")
+    from greg.platforms.windows import uninstall_file_association
+
+    uninstall_file_association()
+    print("Removed Greg's current-user Windows file association.")
     return 0
 
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "greg-encrypted-files"
-version = "0.1.0"
+version = "0.2.0"
 description = "Encrypted wrappers for arbitrary files, edited with their normal desktop applications"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -12,6 +12,13 @@ dependencies = [
   "argon2-cffi>=23.1",
   "cryptography>=43",
   "PySide6>=6.8",
+]
+classifiers = [
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Security :: Cryptography",
 ]
 
 [project.optional-dependencies]
@@ -29,4 +36,3 @@ greg = ["resources/*.desktop", "resources/*.xml"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
-

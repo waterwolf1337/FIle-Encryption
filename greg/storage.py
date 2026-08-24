@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import tempfile
 from pathlib import Path
 from typing import Callable
@@ -40,10 +41,14 @@ def atomic_write(
 
 
 def _fsync_directory(directory: Path) -> None:
+    # Windows cannot open directories through os.open. os.replace still provides
+    # same-volume atomic replacement there; only the extra directory durability
+    # flush is unavailable through Python's standard library.
+    if sys.platform == "win32":
+        return
     flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
     descriptor = os.open(directory, flags)
     try:
         os.fsync(descriptor)
     finally:
         os.close(descriptor)
-

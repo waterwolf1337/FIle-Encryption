@@ -30,8 +30,9 @@ def test_save_cycle_restores_modification_and_cleans_plaintext(tmp_path, fast_pa
 
     assert session.plaintext_path.name == "test.xlsx"
     assert session.plaintext_path.read_bytes() == b"original"
-    assert directory.stat().st_mode & 0o777 == 0o700
-    assert session.plaintext_path.stat().st_mode & 0o777 == 0o600
+    if os.name != "nt":
+        assert directory.stat().st_mode & 0o777 == 0o700
+        assert session.plaintext_path.stat().st_mode & 0o777 == 0o600
     session.plaintext_path.write_bytes(b"modified")
     session.save_and_lock(settle_timeout=0)
 

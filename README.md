@@ -27,8 +27,8 @@ container untouched.
 
 ## Installation
 
-Python 3.12 or newer is required. Linux/Manjaro/KDE is the supported platform for
-this release.
+Python 3.12 or newer is required. Linux and Windows are supported; Linux is the
+primary development platform and both platforms are included in the test matrix.
 
 ### Permanent per-user installation with `uv`
 
@@ -52,7 +52,8 @@ open a new terminal:
 uv tool update-shell
 ```
 
-Install the KDE/Dolphin MIME type and application entry after installing Greg:
+On Linux, install the KDE/Dolphin MIME type and application entry after installing
+Greg:
 
 ```bash
 greg install-linux-integration
@@ -61,6 +62,33 @@ greg install-linux-integration
 The desktop entry records the Python interpreter belonging to Greg's managed tool
 environment. It therefore works without terminal activation. After this step you can
 open `.greg` files from Dolphin as well as from a terminal.
+
+### Windows installation
+
+Open PowerShell. If `uv` is not installed, install it through WinGet:
+
+```powershell
+winget install --id=astral-sh.uv -e
+```
+
+Other supported installation methods are listed in the
+[official `uv` installation guide](https://docs.astral.sh/uv/getting-started/installation/).
+
+Open a new PowerShell window, change to the downloaded source directory, and install
+Greg as an isolated user tool:
+
+```powershell
+cd C:\path\to\FIle-Encryption
+uv tool install .
+greg --help
+greg install-windows-integration
+```
+
+The final command creates a current-user `.greg` association under
+`HKEY_CURRENT_USER`; it does not require administrator rights. Windows may ask which
+application to use the first time. If so, select **Greg encrypted file** and choose
+to use it for `.greg` files. The association launches Greg through `pythonw.exe`, so
+double-clicking a file does not leave a console window open.
 
 ### Updating an existing installation
 
@@ -72,9 +100,15 @@ uv tool install --force .
 greg install-linux-integration
 ```
 
+On Windows, run the equivalent commands in PowerShell and finish with:
+
+```powershell
+greg install-windows-integration
+```
+
 ### Uninstalling
 
-Remove the command and its managed Python environment with:
+On Linux, remove the command and its managed Python environment with:
 
 ```bash
 uv tool uninstall greg-encrypted-files
@@ -87,6 +121,13 @@ rm -f ~/.local/share/applications/greg.desktop
 rm -f ~/.local/share/mime/packages/greg.xml
 update-mime-database ~/.local/share/mime
 update-desktop-database ~/.local/share/applications
+```
+
+On Windows, remove the file association before removing the tool:
+
+```powershell
+greg uninstall-windows-integration
+uv tool uninstall greg-encrypted-files
 ```
 
 ### Development installation
@@ -122,7 +163,7 @@ password or a separate recovery hash.
 
 ### Open and edit a `.greg` file
 
-1. Select **Open .greg…**, double-click the file in Dolphin, or run
+1. Select **Open .greg…**, double-click the file in Dolphin/Explorer, or run
    `greg /path/to/document.greg`.
 2. Enter the password.
 3. Greg restores the original file in a private temporary directory and opens it in
@@ -157,12 +198,22 @@ greg inspect finances.greg
 `inspect` never asks for a password, reveals the encrypted filename, or writes
 plaintext.
 
-### Windows and macOS
+### Platform notes
 
-The cryptographic format and launcher abstraction have Windows and macOS foundations,
-but this release is not ready for important files on those platforms. Windows/macOS
-file association, platform-specific permission hardening, atomic-write verification,
-packaging, and end-to-end testing remain to be completed.
+Linux opens external files with `xdg-open`. Windows uses the normal Shell `open`
+verb, stores its session registry beneath `%LOCALAPPDATA%\Greg`, and registers file
+associations per user. Same-volume replacement through `os.replace` protects the old
+container until the new ciphertext is staged on both platforms. Linux additionally
+flushes the containing directory; Python's standard library does not expose the same
+directory-flush operation on Windows.
+
+Windows temporary files inherit the access control of the current user's `%TEMP%`
+directory. Python's portable permission API cannot construct a stronger Windows ACL,
+so Greg does not claim Unix-style `0600`/`0700` modes there. Administrator access and
+other processes running as the same user remain outside the security boundary.
+
+macOS has a launcher abstraction but does not yet have packaging, file association,
+permission hardening, or end-to-end support.
 
 Greg launches temporary files through `xdg-open` on Linux. It deliberately does not
 wait for that process: desktop applications often accept an open request through an
@@ -172,6 +223,8 @@ open until the user explicitly chooses **Save and Lock** or **Cancel Changes**.
 ## Temporary files and crash recovery
 
 On Linux, unlocked directories and files are created with modes `0700` and `0600`.
+On Windows, they are created inside the current user's randomly named temporary
+directory and inherit that directory's ACL.
 Directory names use a random `greg-session-` prefix and contain a Greg ownership
 marker. A small registry stores only session IDs, directory paths, process IDs, and
 creation times—never passwords, keys, filenames, or file contents. At startup, Greg

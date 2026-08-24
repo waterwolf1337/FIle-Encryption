@@ -20,7 +20,11 @@ class SessionRecord:
     created_at: float
 
 
-def registry_path() -> Path:
+def registry_path(platform_name: str | None = None) -> Path:
+    if (platform_name or os.name) == "nt":
+        local_app_data = os.environ.get("LOCALAPPDATA")
+        base = Path(local_app_data) if local_app_data else Path.home() / "AppData" / "Local"
+        return base / "Greg" / "sessions.json"
     state_home = Path(
         os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state")
     )

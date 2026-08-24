@@ -4,6 +4,7 @@ import os
 import tempfile
 import time
 import uuid
+import sys
 from pathlib import Path
 
 from greg.format.greg_file import UnlockedGreg, unlock
@@ -38,9 +39,10 @@ class GregSession:
         unlocked = unlock(greg_path.read_bytes(), password)
         directory: Path | None = None
         session_id = uuid.uuid4().hex
-        while unlocked.payload.filename == f"{MARKER_PREFIX}{session_id}":
-            session_id = uuid.uuid4().hex
         try:
+            validate_restorable_filename(unlocked.payload.filename)
+            while unlocked.payload.filename == f"{MARKER_PREFIX}{session_id}":
+                session_id = uuid.uuid4().hex
             directory = Path(tempfile.mkdtemp(prefix=SESSION_PREFIX))
             os.chmod(directory, 0o700)
             write_marker(directory, session_id)
@@ -122,3 +124,22 @@ def wait_for_file_to_settle(path: Path, timeout: float, interval: float = 0.2) -
 
 class PlaintextCleanupError(OSError):
     """Ciphertext was saved successfully, but plaintext cleanup did not complete."""
+
+
+def validate_restorable_filename(filename: str, platform: str | None = None) -> None:
+    """Reject names the current platform cannot safely restore as a normal file."""
+    if (platform or sys.platform) != "win32":
+        return
+    forbidden = '<>:"/\\|?*'
+    if any(ord(character) < 32 or character in forbidden for character in filename):
+        raise ValueError("the encrypted filename is not valid on Windows")
+    if filename.endswith((" ", ".")):
+        raise ValueError("Windows filenames cannot end with a space or period")
+    if len(filename.encode("utf-16-le")) // 2 > 255:
+        raise ValueError("the encrypted filename is too long for Windows")
+    device_name = filename.split(".", 1)[0].rstrip(" .").upper()
+    reserved = {"CON", "PRN", "AUX", "NUL", "CLOCK$"}
+    reserved.update(f"COM{index}" for index in range(1, 10))
+    reserved.update(f"LPT{index}" for index in range(1, 10))
+    if device_name in reserved:
+        raise ValueError("the encrypted filename is a reserved Windows device name")
