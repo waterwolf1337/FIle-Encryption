@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-greg-encrypted">
+    <comment>Greg encrypted file</comment>
+    <glob pattern="*.greg"/>
+    <magic priority="80">
+      <match type="string" value="GREG" offset="0"/>
+    </magic>
+  </mime-type>
+</mime-info>

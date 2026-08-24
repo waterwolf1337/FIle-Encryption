@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Greg Encrypted Files
+Comment=Open encrypted .greg files
+Exec=greg %f
+Icon=security-high
+Terminal=false
+MimeType=application/x-greg-encrypted;
+Categories=Utility;Security;
+NoDisplay=false
+
