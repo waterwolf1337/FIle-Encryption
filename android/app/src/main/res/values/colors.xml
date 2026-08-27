@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="greg_primary">#315C49</color>
+    <color name="greg_primary_dark">#214235</color>
+    <color name="greg_accent">#D4A72C</color>
+    <color name="greg_surface">#F7F4EC</color>
+    <color name="greg_text">#17211C</color>
+    <color name="greg_warning">#8B3E2F</color>
+</resources>
+
