@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Greg" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/greg_primary</item>
+        <item name="colorPrimaryDark">@color/greg_primary_dark</item>
+        <item name="colorAccent">@color/greg_accent</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">@color/greg_primary_dark</item>
+        <item name="android:navigationBarColor">@color/greg_surface</item>
+        <item name="android:windowBackground">@color/greg_surface</item>
+        <item name="android:windowActionModeOverlay">true</item>
+    </style>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Greg</string>
+    <string name="app_title">Greg encrypted files</string>
+    <string name="app_subtitle">Encrypt any file, then edit it with the Android app you already use.</string>
+    <string name="encrypt_file">Encrypt file…</string>
+    <string name="open_greg">Open .greg…</string>
+    <string name="security_note">While unlocked, plaintext is shared temporarily with the external editor. That editor may create its own caches or recovery copies.</string>
+    <string name="save_lock">Save and lock</string>
+    <string name="cancel_changes">Cancel changes</string>
+    <string name="session_unlocked">%1$s is unlocked</string>
+</resources>
